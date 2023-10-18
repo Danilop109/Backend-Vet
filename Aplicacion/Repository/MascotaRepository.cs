@@ -35,5 +35,23 @@ namespace Aplicacion.Repository
                 .Include(p=> p.Raza)
             .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        //CONSULTA A-3: Mostrar las mascotas que se encuentren registradas cuya especie sea felina.
+        
+        public async Task<IEnumerable<Mascota>> GetPetEspecie()
+        {
+            return await (
+                from m in _context.Mascotas 
+                join e in _context.Especies on m.IdEspecieFk equals e.Id
+                where e.Nombre == "Felina"
+                select m
+            ).ToListAsync();
+        }
+        public async Task<IEnumerable<Mascota>> GetPetEspecie2()
+        {
+            return await _context.Mascotas
+            .Where(m => m.IdEspecieFk == 1)
+            .ToListAsync();
+        }
     }
 }

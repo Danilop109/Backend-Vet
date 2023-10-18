@@ -8,6 +8,7 @@ namespace Dominio.Interfaces
 {
     public interface IMascota : IGenericRepository<Mascota>
     {
-        
+        Task<IEnumerable<Mascota>> GetPetEspecie();
+        Task<IEnumerable<Mascota>> GetPetEspecie2();
     }
 }

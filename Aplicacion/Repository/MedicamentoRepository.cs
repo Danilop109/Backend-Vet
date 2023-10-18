@@ -31,5 +31,17 @@ namespace Aplicacion.Repository
             .Include(m => m.Laboratorio)
             .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        //CONSULTA A-2: Listar los medicamentos que pertenezcan a el laboratorio Genfar
+        public async Task<IEnumerable<Medicamento>> GetMediFromLab()
+        {
+            return await (
+                from m in _context.Medicamentos
+                join l in _context.Laboratorios on m.IdLaboratorioFk equals l.Id
+                where l.Nombre == "Genfar"
+                select m
+                
+            ).ToListAsync();
+        }
     }
 }

@@ -29,5 +29,13 @@ namespace Aplicacion.Repository
             return await _context.Veterinarios
             .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        //CONSULTA A-1: Crear un consulta que permita visualizar los veterinarios cuya especialidad sea Cirujano vascular.
+        public async Task<IEnumerable<Veterinario>> GetCirujanoVascular()
+        {
+            return await _context.Veterinarios
+            .Where(v => v.Especialidad == "Cirujano Vascular")
+            .ToListAsync();
+        }
     }
 }

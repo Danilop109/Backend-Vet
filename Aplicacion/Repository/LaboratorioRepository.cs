@@ -29,5 +29,6 @@ namespace Aplicacion.Repository
             return await _context.Laboratorios
             .FirstOrDefaultAsync(p => p.Id == id);
         }
+        
     }
 }
