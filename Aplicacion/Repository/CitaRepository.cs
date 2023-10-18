@@ -22,6 +22,7 @@ namespace Aplicacion.Repository
         {
             return await _context.Citas
                 .Include(p => p.Mascota)
+                .Include(p => p.Veterinario)
                 .ToListAsync();
         }
 
@@ -29,6 +30,7 @@ namespace Aplicacion.Repository
         {
             return await _context.Citas
             .Include(p => p.Mascota)
+            .Include(p => p.Veterinario)
             .FirstOrDefaultAsync(p => p.Id == id);
         }
     }

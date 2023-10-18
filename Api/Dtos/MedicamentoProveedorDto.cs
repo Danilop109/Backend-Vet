@@ -8,6 +8,7 @@ namespace Api.Dtos
 {
     public class MedicamentoProveedorDto
     {
+        public int Id { get; set; }
         public int IdProveedorFk { get; set; }
         public ProveedorDto Proveedor { get; set; }
         public int IdMedicamentoFk { get; set; }

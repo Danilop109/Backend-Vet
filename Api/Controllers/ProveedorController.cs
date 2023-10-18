@@ -3,30 +3,96 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using API.Dtos;
+using AutoMapper;
+using Dominio.Entities;
+using Dominio.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
-    [Route("[controller]")]
-    public class ProveedorController : Controller
+    public class ProveedorController : BaseApiController
     {
-        private readonly ILogger<ProveedorController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ProveedorController(ILogger<ProveedorController> logger)
+        public ProveedorController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _logger = logger;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View("Error!");
+    public async Task<ActionResult<IEnumerable<ProveedorDto>>> Get()
+    {
+        var entidad = await _unitOfWork.Proveedores.GetAllAsync();
+        return _mapper.Map<List<ProveedorDto>>(entidad);
+    }
+
+    [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+    public async Task<ActionResult<ProveedorDto>> Get(int id)
+    {
+        var entidad = await _unitOfWork.Proveedores.GetByIdAsync(id);
+        if (entidad == null){
+            return NotFound();
         }
+        return _mapper.Map<ProveedorDto>(entidad);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+    public async Task<ActionResult<Proveedor>> Post(ProveedorDto proveedorDto)
+    {
+        var entidad = this._mapper.Map<Proveedor>(proveedorDto);
+        this._unitOfWork.Proveedores.Add(entidad);
+        await _unitOfWork.SaveAsync();
+        if(entidad == null)
+        {
+            return BadRequest();
+        }
+        proveedorDto.Id = entidad.Id;
+        return CreatedAtAction(nameof(Post), new {id = proveedorDto.Id}, proveedorDto);
+    }
+
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+    public async Task<ActionResult<ProveedorDto>> Put(int id, [FromBody]ProveedorDto proveedorDto){
+        if(proveedorDto == null)
+        {
+            return NotFound();
+        }
+        var entidad = this._mapper.Map<Proveedor>(proveedorDto);
+        _unitOfWork.Proveedores.Update(entidad);
+        await _unitOfWork.SaveAsync();
+        return proveedorDto;
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+    public async Task<IActionResult> Delete(int id){
+        var entidad = await _unitOfWork.Proveedores.GetByIdAsync(id);
+        if(entidad == null)
+        {
+            return NotFound();
+        }
+        _unitOfWork.Proveedores.Remove(entidad);
+        await _unitOfWork.SaveAsync();
+        return NoContent();
+    }
     }
 }

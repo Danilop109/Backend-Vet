@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dominio.Entities;
 using Dominio.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Persistencia;
 
 namespace Aplicacion.Repository
@@ -15,6 +16,20 @@ namespace Aplicacion.Repository
         public MovimientoMedicamentoRepository(ApiJwtContext context) : base(context)
         {
             _context = context;
+        }
+
+         public override async Task<IEnumerable<MovimientoMedicamento>> GetAllAsync()
+        {
+            return await _context.MovimientoMedicamentos
+                .Include(m => m.TipoMovimiento)
+                .ToListAsync();
+        }
+
+        public override async Task<MovimientoMedicamento> GetByIdAsync(int id)
+        {
+            return await _context.MovimientoMedicamentos
+            .Include(m => m.TipoMovimiento)
+            .FirstOrDefaultAsync(p => p.Id == id);
         }
     }
 }

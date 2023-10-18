@@ -5,6 +5,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Api.Dtos;
 using Api.Services;
+using AutoMapper;
+using Dominio.Entities;
+using Dominio.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -13,10 +16,88 @@ namespace Api.Controllers
     public class UserController : BaseApiController
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        public UserController(IUserService userService, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _userService = userService;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
+
+        [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+    public async Task<ActionResult<IEnumerable<UserDto>>> Get()
+    {
+        var entidad = await _unitOfWork.Users.GetAllAsync();
+        return _mapper.Map<List<UserDto>>(entidad);
+    }
+
+    [HttpGet("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+    public async Task<ActionResult<UserDto>> Get(int id)
+    {
+        var entidad = await _unitOfWork.Users.GetByIdAsync(id);
+        if (entidad == null){
+            return NotFound();
+        }
+        return _mapper.Map<UserDto>(entidad);
+    }
+
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+    public async Task<ActionResult<User>> Post(UserDto userDto)
+    {
+        var entidad = this._mapper.Map<User>(userDto);
+        this._unitOfWork.Users.Add(entidad);
+        await _unitOfWork.SaveAsync();
+        if(entidad == null)
+        {
+            return BadRequest();
+        }
+        userDto.Id = entidad.Id;
+        return CreatedAtAction(nameof(Post), new {id = userDto.Id}, userDto);
+    }
+
+    [HttpPut("{id}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+    public async Task<ActionResult<UserDto>> Put(int id, [FromBody]UserDto userDto){
+        if(userDto == null)
+        {
+            return NotFound();
+        }
+        var entidad = this._mapper.Map<User>(userDto);
+        _unitOfWork.Users.Update(entidad);
+        await _unitOfWork.SaveAsync();
+        return userDto;
+    }
+
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+    public async Task<IActionResult> Delete(int id){
+        var entidad = await _unitOfWork.Users.GetByIdAsync(id);
+        if(entidad == null)
+        {
+            return NotFound();
+        }
+        _unitOfWork.Users.Remove(entidad);
+        await _unitOfWork.SaveAsync();
+        return NoContent();
+    }
+
+
 
     [HttpPost("register")]
     public async Task<ActionResult> RegisterAsync(RegisterDto model)
