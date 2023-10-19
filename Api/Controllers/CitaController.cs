@@ -66,6 +66,7 @@ namespace Api.Controllers
     
     //CONSULTA 6
     [HttpGet("GetPetMotiveDate")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<object>> GetPetMotiveDateConsulta6()
@@ -74,6 +75,18 @@ namespace Api.Controllers
         var dto = _mapper.Map<IEnumerable<object>>(entidad);
         return Ok(dto);
     }
+
+    [HttpGet("GetPetMotiveDate")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Pager<object>>> GetPetMotiveDateConsulta6Pag([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.Citas.GetPetMotiveDate(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<object>>(entidad.registros);
+        return Ok(new Pager<object>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

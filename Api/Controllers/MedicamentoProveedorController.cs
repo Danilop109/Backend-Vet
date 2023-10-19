@@ -66,6 +66,7 @@ namespace Api.Controllers
 
     //CONSULTA B-4
     [HttpGet("GetProveeSaleMedi")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<object>> GetProveeSaleMediConsultaB4()
@@ -73,6 +74,17 @@ namespace Api.Controllers
         var entidad = await _unitOfWork.MedicamentoProveedores.GetProveeSaleMedi();
         var dto = _mapper.Map<IEnumerable<object>>(entidad);
         return Ok(dto);
+    }
+
+    [HttpGet("GetProveeSaleMedi")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Pager<object>>> GetProveeSaleMediConsultaB4Pag([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.MedicamentoProveedores.GetProveeSaleMedi(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<object>>(entidad.registros);
+        return Ok(new Pager<object>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
     }
 
     [HttpPost]

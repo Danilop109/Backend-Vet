@@ -56,5 +56,27 @@ namespace Aplicacion.Repository
             .Where(v => v.Especialidad == "Cirujano Vascular")
             .ToListAsync();
         }
+
+        public async Task<(int totalRegistros, IEnumerable<Veterinario> registros)> GetCirujanoVascular(int pageIndex, int pageSize, string search)
+        {
+            var query = _context.Veterinarios
+            .Where(v => v.Especialidad == "Cirujano Vascular");
+            
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Nombre.ToLower().Contains(search));
+            }
+
+            query = query.OrderBy(p => p.Nombre);
+            var totalRegistros = await query.CountAsync();
+            var registros = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (totalRegistros, registros);
+        }
+
     }
 }

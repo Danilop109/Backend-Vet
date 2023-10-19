@@ -64,17 +64,30 @@ namespace Api.Controllers
     }
     //CONSULTA 3
     [HttpGet("GetPetEspecie")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Mascota>> GetPetEspecieConsulta3()
+    public async Task<ActionResult<object>> GetPetEspecieConsulta3()
     {
         var entidad = await _unitOfWork.Mascotas.GetPetEspecie();
-        var dto = _mapper.Map<IEnumerable<Mascota>>(entidad);
+        var dto = _mapper.Map<IEnumerable<object>>(entidad);
         return Ok(dto);
+    }
+
+    [HttpGet("GetPetEspecie")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Pager<object>>> GetPetEspecieConsulta3Pag([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.Mascotas.GetPetEspecie(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<object>>(entidad.registros);
+        return Ok(new Pager<object>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
     }
 
     //CONSULTA B-1
     [HttpGet("GetPetGropuByEspe")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<object>> GetPetGropuByEspeConsultaB1()
@@ -84,8 +97,20 @@ namespace Api.Controllers
         return Ok(dto);
     }
 
+    [HttpGet("GetPetGropuByEspe")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Pager<object>>> GetPetGropuByEspeConsultaB1Pag([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.Mascotas.GetPetGropuByEspe(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<object>>(entidad.registros);
+        return Ok(new Pager<object>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
+    }
+
     //CONSULTA B-3
     [HttpGet("GetPetForVet")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<object>> GetPetForVetConsultaB3()
@@ -93,6 +118,17 @@ namespace Api.Controllers
         var entidad = await _unitOfWork.Mascotas.GetPetForVet();
         var dto = _mapper.Map<IEnumerable<object>>(entidad);
         return Ok(dto);
+    }
+
+    [HttpGet("GetPetForVet")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Pager<object>>> GetPetForVetConsultaB3Pag([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.Mascotas.GetPetForVet(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<object>>(entidad.registros);
+        return Ok(new Pager<object>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
     }
 
     //CONSULTA B-5

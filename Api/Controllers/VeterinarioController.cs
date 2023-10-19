@@ -64,6 +64,7 @@ namespace Api.Controllers
     }
     //CONSULTA 1
     [HttpGet("GetCirujanoVascular")]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Veterinario>> GetPetEspecieConsulta1()
@@ -71,6 +72,17 @@ namespace Api.Controllers
         var entidad = await _unitOfWork.Veterinarios.GetCirujanoVascular();
         var dto = _mapper.Map<IEnumerable<Veterinario>>(entidad);
         return Ok(dto);
+    }
+
+    [HttpGet("GetCirujanoVascular")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Pager<Veterinario>>> GetPetEspecieConsulta1Pag([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.Veterinarios.GetCirujanoVascular(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<Veterinario>>(entidad.registros);
+        return Ok(new Pager<Veterinario>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
     }
 
     [HttpPost]

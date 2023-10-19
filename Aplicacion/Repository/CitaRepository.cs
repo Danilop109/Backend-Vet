@@ -35,39 +35,70 @@ namespace Aplicacion.Repository
         }
 
         public override async Task<(int totalRegistros, IEnumerable<Cita> registros)> GetAllAsync(int pageIndez, int pageSize, int search)
-    {
-        var query = _context.Citas as IQueryable<Cita>;
-
-        if (!string.IsNullOrEmpty(search.ToString()))
         {
-            query = query.Where(p => p.IdVeterinarioFk == search);
+            var query = _context.Citas as IQueryable<Cita>;
+
+            if (!string.IsNullOrEmpty(search.ToString()))
+            {
+                query = query.Where(p => p.IdVeterinarioFk == search);
+            }
+
+            query = query.OrderBy(p => p.Id);
+            var totalRegistros = await query.CountAsync();
+            var registros = await query
+                .Skip((pageIndez - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (totalRegistros, registros);
         }
-
-        query = query.OrderBy(p => p.Id);
-        var totalRegistros = await query.CountAsync();
-        var registros = await query
-            .Skip((pageIndez - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
-
-        return (totalRegistros, registros);
-    }
 
         //CONSULTA A-6 : Listar las mascotas que fueron atendidas por motivo de vacunacion en el primer trimestre del 2023
         public async Task<IEnumerable<object>> GetPetMotiveDate()
         {
-            DateOnly uno = new DateOnly(2023,01,01);
-            DateOnly tres = new DateOnly(2023,01,01);
+            DateOnly uno = new DateOnly(2023, 01, 01);
+            DateOnly tres = new DateOnly(2023, 03, 31);
             var objeto = from c in _context.Citas
-            join m in _context.Mascotas on c.IdMascotaFk equals m.Id
-            where c.Motivo == "Vacunacion" && c.Fecha >= uno && c.Fecha<= tres
-            select new 
-            {
-                Nombre = m.Nombre,
-                Fecha = c.Fecha,
-                Motivo = c.Motivo
-            };
+                         join m in _context.Mascotas on c.IdMascotaFk equals m.Id
+                         where c.Motivo == "Vacunacion" && c.Fecha >= uno && c.Fecha <= tres
+                         select new
+                         {
+                            Id= c.Id,
+                             Nombre = m.Nombre,
+                             Fecha = c.Fecha,
+                             Motivo = c.Motivo
+                         };
             return await objeto.ToListAsync();
+        }
+
+        public async Task<(int totalRegistros, IEnumerable<object> registros)> GetPetMotiveDate(int pageIndex, int pageSize, string search)
+        {
+            DateOnly uno = new DateOnly(2023, 01, 01);
+            DateOnly tres = new DateOnly(2023, 03, 31);
+            var query = from c in _context.Citas
+                         join m in _context.Mascotas on c.IdMascotaFk equals m.Id
+                         where c.Motivo == "Vacunacion" && c.Fecha >= uno && c.Fecha <= tres
+                         select new
+                         {
+                            Id= c.Id,
+                             Nombre = m.Nombre,
+                             Fecha = c.Fecha,
+                             Motivo = c.Motivo
+                         };
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Nombre.ToLower().Contains(search));
+            }
+
+            query = query.OrderBy(p => p.Nombre);
+            var totalRegistros = await query.CountAsync();
+            var registros = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (totalRegistros, registros);
         }
     }
 }

@@ -46,8 +46,8 @@ namespace Aplicacion.Repository
         query = query.OrderBy(p => p.Id);
         var totalRegistros = await query.CountAsync();
         var registros = await query
-            .Include(p => p.Proveedor)
-            .Include(p => p.Medicamento)
+            .Include(p => p.Proveedor.Nombre)
+            .Include(p => p.Medicamento.Nombre)
             .Skip((pageIndex - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -74,5 +74,34 @@ namespace Aplicacion.Repository
             return await query.ToListAsync();
         }
 
+        public async Task<(int totalRegistros, IEnumerable<object> registros)> GetProveeSaleMedi(int pageIndex, int pageSize, string search)
+        {
+            var query = from p in _context.Proveedores
+                        select new
+                        {
+                            NombreProveedor = p.Nombre,
+                            Medicamentos = (from mp in _context.MedicamentoProveedores
+                                            join m in _context.Medicamentos on mp.IdMedicamentoFk equals m.Id
+                                            where mp.IdProveedorFk == p.Id
+                                            select new
+                                            {
+                                                NombreMedicamento = m.Nombre
+                                            }).ToList()
+                        };
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.NombreProveedor.ToLower().Contains(search));
+            }
+
+            query = query.OrderBy(p => p.NombreProveedor);
+            var totalRegistros = await query.CountAsync();
+            var registros = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (totalRegistros, registros);
+        }
     }
 }

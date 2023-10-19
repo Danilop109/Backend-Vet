@@ -8,6 +8,7 @@ namespace Dominio.Interfaces
 {
     public interface IRaza : IGenericRepository<Raza>
     {
-        Task<IEnumerable<object>> GetPetsByRaza();
+        abstract Task<IEnumerable<object>> GetPetsByRaza();
+        abstract Task<(int totalRegistros,object registros)> GetPetsByRaza(int pageIndez, int pageSize, string search);
     }
 }

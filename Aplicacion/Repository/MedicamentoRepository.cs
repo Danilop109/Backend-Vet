@@ -53,15 +53,48 @@ namespace Aplicacion.Repository
     }
 
         //CONSULTA A-2: Listar los medicamentos que pertenezcan a el laboratorio Genfar
-        public async Task<IEnumerable<Medicamento>> GetMediFromLab()
+        public async Task<IEnumerable<object>> GetMediFromLab()
         {
             return await (
                 from m in _context.Medicamentos
                 join l in _context.Laboratorios on m.IdLaboratorioFk equals l.Id
                 where l.Nombre == "Genfar"
-                select m
+                select new {
+                    NombreMedicamento= m.Nombre,
+                    Precio=m.Precio,
+                    NombreLaboratorio= l.Nombre 
+                }
                 
             ).ToListAsync();
+        }
+
+        public async Task<(int totalRegistros, IEnumerable<object> registros)> GetMediFromLab(int pageIndex, int pageSize, string search)
+        {
+            var query = (
+                from m in _context.Medicamentos
+                join l in _context.Laboratorios on m.IdLaboratorioFk equals l.Id
+                where l.Nombre == "Genfar"
+                select new {
+                    NombreMedicamento= m.Nombre,
+                    Precio=m.Precio,
+                    NombreLaboratorio= l.Nombre 
+                }
+                
+            );
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.NombreMedicamento.ToLower().Contains(search));
+            }
+
+            query = query.OrderBy(p => p.NombreMedicamento);
+            var totalRegistros = await query.CountAsync();
+            var registros = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (totalRegistros, registros);
         }
 
         //CONSULTA A-5: Listar los medicamentos que tenga un precio de venta mayor a 50000
@@ -71,6 +104,26 @@ namespace Aplicacion.Repository
             return await _context.Medicamentos
             .Where(m => m.Precio >= 50000)
             .ToListAsync();
+        }
+
+        public async Task<(int totalRegistros, IEnumerable<Medicamento> registros)> GetMedi50000(int pageIndex, int pageSize, string search)
+        {
+            var query = _context.Medicamentos
+            .Where(m => m.Precio >= 50000);
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Nombre.ToLower().Contains(search));
+            }
+
+            query = query.OrderBy(p => p.Nombre);
+            var totalRegistros = await query.CountAsync();
+            var registros = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (totalRegistros, registros);
         }
     }
 }

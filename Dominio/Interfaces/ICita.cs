@@ -8,6 +8,7 @@ namespace Dominio.Interfaces
 {
     public interface ICita : IGenericRepository<Cita>
     {
-        Task<IEnumerable<object>> GetPetMotiveDate();
+        abstract Task<IEnumerable<object>> GetPetMotiveDate();
+        abstract Task<(int totalRegistros, IEnumerable<object> registros)> GetPetMotiveDate(int pageIndex, int pageSize, string search);
     }
 }

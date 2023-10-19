@@ -69,5 +69,38 @@ namespace Aplicacion.Repository
             };
             return await objeto.ToListAsync();
         }
+
+        public async Task<(int totalRegistros, IEnumerable<object> registros)> GetPetPer(int pageIndex, int pageSize, string search)
+        {
+            var query = from p in _context.Propietarios
+            select new{
+                    Nombre= p.Nombre,
+                    Correo = p.Correo,
+                    Telefono= p.Telefono,
+                
+                mascotas = (
+                    from m in _context.Mascotas
+                    where p.Id == m.IdPropietarioFk
+                    select new {
+                        Nombre = m.Nombre,
+                        Fecha= m.FechaNacimiento
+                    }
+                ).ToList()
+            };
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Nombre.ToLower().Contains(search));
+            }
+
+            query = query.OrderBy(p => p.Nombre);
+            var totalRegistros = await query.CountAsync();
+            var registros = await query
+                .Skip((pageIndex - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (totalRegistros, registros);
+        }
     }
 }

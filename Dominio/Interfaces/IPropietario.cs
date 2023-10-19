@@ -8,6 +8,7 @@ namespace Dominio.Interfaces
 {
     public interface IPropietario : IGenericRepository<Propietario>
     {
-        Task<IEnumerable<object>> GetPetPer();
+        abstract Task<IEnumerable<object>> GetPetPer();
+        abstract Task<(int totalRegistros, IEnumerable<object> registros)> GetPetPer(int pageIndex, int pageSize, string search);
     }
 }

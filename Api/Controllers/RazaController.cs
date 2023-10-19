@@ -76,6 +76,17 @@ namespace Api.Controllers
         return Ok(dto);
     }
 
+    [HttpGet("GetPetsByRaza")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Pager<object>>> GetPetsByRazaConsultaB6([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.Razas.GetPetsByRaza(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<object>>(entidad.registros);
+        return Ok(new Pager<object>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

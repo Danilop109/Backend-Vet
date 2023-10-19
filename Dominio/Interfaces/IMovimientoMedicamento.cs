@@ -8,6 +8,7 @@ namespace Dominio.Interfaces
 {
     public interface IMovimientoMedicamento : IGenericRepository<MovimientoMedicamento>
     {
-        Task<IEnumerable<object>> GetmoviMedi();
+        abstract Task<IEnumerable<object>> GetmoviMedi();
+        abstract Task<(int totalRegistros,IEnumerable<object> registros)> GetmoviMedi(int pageIndez, int pageSize, string search);
     }
 }

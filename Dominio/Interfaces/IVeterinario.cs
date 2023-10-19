@@ -8,6 +8,7 @@ namespace Dominio.Interfaces
 {
     public interface IVeterinario : IGenericRepository<Veterinario>
     {
-        Task<IEnumerable<Veterinario>> GetCirujanoVascular();
+        abstract Task<IEnumerable<Veterinario>> GetCirujanoVascular();
+        abstract Task<(int totalRegistros, IEnumerable<Veterinario> registros)> GetCirujanoVascular(int pageIndex, int pageSize, string search);
     }
 }
