@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Api.Helpers.Errors;
 using API.Dtos;
 using AutoMapper;
 using Dominio.Entities;
 using Dominio.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
+    // [Authorize]
     public class RazaController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -24,6 +29,7 @@ namespace Api.Controllers
         }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
@@ -31,6 +37,17 @@ namespace Api.Controllers
     {
         var entidad = await _unitOfWork.Razas.GetAllAsync();
         return _mapper.Map<List<RazaDto>>(entidad);
+    }
+
+    [HttpGet]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<RazaDto>>> Get([FromQuery] Params Parameters)
+    {
+        var Breed = await _unitOfWork.Razas.GetAllAsync(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<RazaDto>>(Breed.registros);
+        return Ok(new Pager<RazaDto>(listEntidad, Breed.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
     }
 
     [HttpGet("{id}")]
@@ -45,6 +62,18 @@ namespace Api.Controllers
             return NotFound();
         }
         return _mapper.Map<RazaDto>(entidad);
+    }
+
+    //CONSULTA B-6
+    [HttpGet("GetPetsByRaza")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<object>> GetPetsByRazaConsultaB6()
+    {
+        var entidad = await _unitOfWork.Razas.GetPetsByRaza();
+        var dto = _mapper.Map<IEnumerable<object>>(entidad);
+        return Ok(dto);
     }
 
     [HttpPost]

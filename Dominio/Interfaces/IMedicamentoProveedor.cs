@@ -8,6 +8,6 @@ namespace Dominio.Interfaces
 {
     public interface IMedicamentoProveedor : IGenericRepository<MedicamentoProveedor>
     {
-        
+        Task<IEnumerable<object>> GetProveeSaleMedi();
     }
 }

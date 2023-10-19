@@ -18,7 +18,7 @@ namespace Aplicacion.Repository
             _context = context;
         }
 
-         public override async Task<IEnumerable<MedicamentoProveedor>> GetAllAsync()
+        public override async Task<IEnumerable<MedicamentoProveedor>> GetAllAsync()
         {
             return await _context.MedicamentoProveedores
                 .Include(m => m.Proveedor)
@@ -33,5 +33,25 @@ namespace Aplicacion.Repository
             .Include(m => m.Medicamento)
             .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        //CONSULTA B-4: Listar los proveedores que me venden un determinado medicamento.
+        public async Task<IEnumerable<object>> GetProveeSaleMedi()
+        {
+            var query = from p in _context.Proveedores
+                        select new
+                        {
+                            NombreProveedor = p.Nombre,
+                            Medicamentos = (from mp in _context.MedicamentoProveedores
+                                            join m in _context.Medicamentos on mp.IdMedicamentoFk equals m.Id
+                                            where mp.IdProveedorFk == p.Id
+                                            select new
+                                            {
+                                                NombreMedicamento = m.Nombre
+                                            }).ToList()
+                        };
+
+            return await query.ToListAsync();
+        }
+
     }
 }

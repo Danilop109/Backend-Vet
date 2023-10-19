@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
+    
     public class CitaController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;

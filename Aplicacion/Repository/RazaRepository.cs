@@ -31,5 +31,39 @@ namespace Aplicacion.Repository
             .Include(r => r.Especie)
             .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        public override async Task<(int totalRegistros, IEnumerable<Raza> registros)> GetAllAsync(int pageIndez, int pageSize, string search)
+    {
+        var query = _context.Razas as IQueryable<Raza>;
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(p => p.Nombre.ToLower().Contains(search));
+        }
+
+        query = query.OrderBy(p => p.Id);
+        var totalRegistros = await query.CountAsync();
+        var registros = await query
+            .Include(p => p.Mascotas)
+            .Skip((pageIndez - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (totalRegistros, registros);
+    }
+
+    //CONSULTA B-6:Listar la cantidad de mascotas que pertenecen a una raza a una raza. Nota: Se debe mostrar una lista de las razas y la cantidad de mascotas que pertenecen a la raza. 
+        public virtual async Task<IEnumerable<object>> GetPetsByRaza()
+        {
+            var objeto = from r in _context.Razas
+                         join m in _context.Mascotas on r.Id equals m.IdRazaFk into razaMascotas
+                         select new
+                         {
+                             NombreRaza = r.Nombre,
+                             CantidadMascotas = razaMascotas.Count()
+                         };
+
+            return await objeto.ToListAsync();
+        }
     }
 }

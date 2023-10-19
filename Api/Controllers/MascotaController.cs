@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Api.Helpers.Errors;
 using API.Dtos;
 using AutoMapper;
 using Dominio.Entities;
@@ -12,6 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
+    // [Authorize]
     public class MascotaController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -66,6 +70,40 @@ namespace Api.Controllers
         var entidad = await _unitOfWork.Mascotas.GetPetGropuByEspe();
         var dto = _mapper.Map<IEnumerable<object>>(entidad);
         return Ok(dto);
+    }
+
+    //CONSULTA B-3
+    [HttpGet("GetPetForVet")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<object>> GetPetForVetConsultaB3()
+    {
+        var entidad = await _unitOfWork.Mascotas.GetPetForVet();
+        var dto = _mapper.Map<IEnumerable<object>>(entidad);
+        return Ok(dto);
+    }
+
+    //CONSULTA B-5
+    [HttpGet("GetPetProRazaGoldenRetriever")]
+    [MapToApiVersion("1.0")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<object>> GetPetProRazaGoldenRetrieverConsultaB5()
+    {
+        var entidad = await _unitOfWork.Mascotas.GetPetProRazaGoldenRetriever();
+        var dto = _mapper.Map<IEnumerable<object>>(entidad);
+        return Ok(dto);
+    }
+
+    [HttpGet("GetPetProRazaGoldenRetriever")]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IEnumerable<object>>> GetPetProRazaGoldenRetrieverConsultab5([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.Mascotas.GetPetProRazaGoldenRetriever(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<object>>(entidad.registros);
+        return Ok(new Pager<object>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
     }
 
     [HttpPost]

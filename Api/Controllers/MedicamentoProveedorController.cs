@@ -47,6 +47,17 @@ namespace Api.Controllers
         return _mapper.Map<MedicamentoProveedorDto>(entidad);
     }
 
+    //CONSULTA B-4
+    [HttpGet("GetProveeSaleMedi")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<object>> GetProveeSaleMediConsultaB4()
+    {
+        var entidad = await _unitOfWork.MedicamentoProveedores.GetProveeSaleMedi();
+        var dto = _mapper.Map<IEnumerable<object>>(entidad);
+        return Ok(dto);
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
