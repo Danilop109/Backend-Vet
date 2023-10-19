@@ -17,7 +17,6 @@ namespace Api.Controllers
 {
     [ApiVersion("1.0")]
     [ApiVersion("1.1")]
-    // [Authorize]
     public class UserController : BaseApiController
     {
         private readonly IUserService _userService;
@@ -144,6 +143,7 @@ namespace Api.Controllers
     }
 
     [HttpPost("refresh-token")]
+    [Authorize]
     public async Task<IActionResult> RefreshToken()
     {
         var refreshToken = Request.Cookies["refreshToken"];

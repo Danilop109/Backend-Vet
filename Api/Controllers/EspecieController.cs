@@ -8,6 +8,7 @@ using API.Dtos;
 using AutoMapper;
 using Dominio.Entities;
 using Dominio.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -15,7 +16,7 @@ namespace Api.Controllers
 {
     [ApiVersion("1.0")]
     [ApiVersion("1.1")]
-    // [Authorize]
+    [Authorize]
     public class EspecieController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;
