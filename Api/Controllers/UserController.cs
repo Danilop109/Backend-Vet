@@ -67,6 +67,7 @@ namespace Api.Controllers
     }
 
     [HttpPost]
+    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
@@ -84,6 +85,7 @@ namespace Api.Controllers
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -100,6 +102,7 @@ namespace Api.Controllers
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Administrador")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
 
@@ -117,6 +120,7 @@ namespace Api.Controllers
 
 
     [HttpPost("register")]
+    [Authorize(Roles = "Administrador")]
     public async Task<ActionResult> RegisterAsync(RegisterDto model)
     {
         var result = await _userService.RegisterAsync(model);
@@ -132,6 +136,7 @@ namespace Api.Controllers
     }
 
     [HttpPost("addrole")]
+    [Authorize(Roles = "Administrador")]
     public async Task<IActionResult> AddRoleAsync(AddRoleDto model)
     {
         var result = await _userService.AddRoleAsync(model);
