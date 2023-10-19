@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Api.Helpers.Errors;
 using API.Dtos;
 using AutoMapper;
 using Dominio.Entities;
@@ -12,6 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
+    // [Authorize]
     public class DetalleMovimientoController : BaseApiController
     {
        private readonly IUnitOfWork _unitOfWork;
@@ -24,6 +28,7 @@ namespace Api.Controllers
         }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
@@ -31,6 +36,19 @@ namespace Api.Controllers
     {
         var entidad = await _unitOfWork.DetalleMovimientos.GetAllAsync();
         return _mapper.Map<List<DetalleMovimientoDto>>(entidad);
+    }
+
+    [HttpGet]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+    public async Task<ActionResult<IEnumerable<DetalleMovimientoDto>>> Get([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.DetalleMovimientos.GetAllAsync(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<DetalleMovimientoDto>>(entidad.registros);
+        return Ok(new Pager<DetalleMovimientoDto>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
+    
     }
 
     [HttpGet("{id}")]

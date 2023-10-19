@@ -33,5 +33,26 @@ namespace Aplicacion.Repository
             .Include(p => p.MovimientoMedicamento)
             .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        public override async Task<(int totalRegistros, IEnumerable<DetalleMovimiento> registros)> GetAllAsync(int pageIndez, int pageSize, int search)
+        {
+            var query = _context.DetalleMovimientos as IQueryable<DetalleMovimiento>;
+
+            if (!string.IsNullOrEmpty(search.ToString()))
+            {
+                query = query.Where(p => p.IdMovimientoMedicamentoFk == search);
+            }
+
+            query = query.OrderBy(p => p.Id);
+            var totalRegistros = await query.CountAsync();
+            var registros = await query
+                .Include(p => p.MovimientoMedicamento)
+                .Include(p => p.Medicamento)
+                .Skip((pageIndez - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (totalRegistros, registros);
+        }
     }
 }

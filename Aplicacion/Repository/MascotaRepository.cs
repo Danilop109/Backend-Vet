@@ -36,6 +36,26 @@ namespace Aplicacion.Repository
             .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public override async Task<(int totalRegistros, IEnumerable<Mascota> registros)> GetAllAsync(int pageIndez, int pageSize, string search)
+    {
+        var query = _context.Mascotas as IQueryable<Mascota>;
+
+        if(!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(p => p.Nombre.ToLower().Contains(search));
+        }
+
+        query = query.OrderBy(p => p.Id);
+        var totalRegistros = await query.CountAsync();
+        var registros = await query 
+            .Include(p => p.Propietario)
+            .Skip((pageIndez - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (totalRegistros, registros);
+    }
+
         //CONSULTA A-3: Mostrar las mascotas que se encuentren registradas cuya especie sea felina.
 
         public async Task<IEnumerable<Mascota>> GetPetEspecie()

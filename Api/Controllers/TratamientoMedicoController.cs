@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Api.Helpers.Errors;
 using API.Dtos;
 using AutoMapper;
 using Dominio.Entities;
@@ -12,6 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
+    // [Authorize]
     public class TratamientoMedicoController : BaseApiController
     {
        private readonly IUnitOfWork _unitOfWork;
@@ -45,6 +49,17 @@ namespace Api.Controllers
             return NotFound();
         }
         return _mapper.Map<TratamientoMedicoDto>(entidad);
+    }
+
+    [HttpGet]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Pager<TratamientoMedicoDto>>> GetPagination([FromQuery] Params paisParams)
+    {
+        var entidad = await _unitOfWork.TratamientoMedicos.GetAllAsync(paisParams.PageIndex, paisParams.PageSize, paisParams.Search);
+        var listEntidad = _mapper.Map<List<TratamientoMedicoDto>>(entidad.registros);
+        return new Pager<TratamientoMedicoDto>(listEntidad, entidad.totalRegistros, paisParams.PageIndex, paisParams.PageSize, paisParams.Search);
     }
 
     [HttpPost]

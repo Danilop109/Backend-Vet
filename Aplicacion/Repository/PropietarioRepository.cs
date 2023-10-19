@@ -30,6 +30,25 @@ namespace Aplicacion.Repository
             .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public override async Task<(int totalRegistros, IEnumerable<Propietario> registros)> GetAllAsync(int pageIndez, int pageSize, string search)
+    {
+        var query = _context.Propietarios as IQueryable<Propietario>;
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(p => p.Nombre.ToLower().Contains(search));
+        }
+
+        query = query.OrderBy(p => p.Id);
+        var totalRegistros = await query.CountAsync();
+        var registros = await query
+            .Skip((pageIndez - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (totalRegistros, registros);
+    }
+
         //CONSULTA A-4: Listar los propietarios y sus mascotas.
         public async Task<IEnumerable<object>> GetPetPer()
         {

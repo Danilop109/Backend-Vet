@@ -34,6 +34,27 @@ namespace Aplicacion.Repository
             .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public override async Task<(int totalRegistros, IEnumerable<MedicamentoProveedor> registros)> GetAllAsync(int pageIndex, int pageSize, int search)
+    {
+        var query = _context.MedicamentoProveedores as IQueryable<MedicamentoProveedor>;
+
+        if (search != 0)
+        {
+            query = query.Where(p => p.IdProveedorFk == search);
+        }
+
+        query = query.OrderBy(p => p.Id);
+        var totalRegistros = await query.CountAsync();
+        var registros = await query
+            .Include(p => p.Proveedor)
+            .Include(p => p.Medicamento)
+            .Skip((pageIndex - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (totalRegistros, registros);
+    }
+
         //CONSULTA B-4: Listar los proveedores que me venden un determinado medicamento.
         public async Task<IEnumerable<object>> GetProveeSaleMedi()
         {

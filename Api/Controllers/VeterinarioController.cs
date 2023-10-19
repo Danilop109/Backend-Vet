@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Api.Helpers.Errors;
 using API.Dtos;
 using AutoMapper;
 using Dominio.Entities;
@@ -12,6 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
+    // [Authorize]
     public class VeterinarioController : BaseApiController
     {
        private readonly IUnitOfWork _unitOfWork;
@@ -24,6 +28,7 @@ namespace Api.Controllers
         }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
@@ -45,6 +50,17 @@ namespace Api.Controllers
             return NotFound();
         }
         return _mapper.Map<VeterinarioDto>(entidad);
+    }
+
+    [HttpGet]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Pager<VeterinarioDto>>> GetPagination([FromQuery] Params paisParams)
+    {
+        var entidad = await _unitOfWork.Veterinarios.GetAllAsync(paisParams.PageIndex, paisParams.PageSize, paisParams.Search);
+        var listEntidad = _mapper.Map<List<VeterinarioDto>>(entidad.registros);
+        return new Pager<VeterinarioDto>(listEntidad, entidad.totalRegistros, paisParams.PageIndex, paisParams.PageSize, paisParams.Search);
     }
     //CONSULTA 1
     [HttpGet("GetCirujanoVascular")]

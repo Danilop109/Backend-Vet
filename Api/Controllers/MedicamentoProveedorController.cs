@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Api.Dtos;
+using Api.Helpers.Errors;
 using AutoMapper;
 using Dominio.Entities;
 using Dominio.Interfaces;
@@ -12,6 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
+    // [Authorize]
     public class MedicamentoProveedorController : BaseApiController
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -24,6 +28,7 @@ namespace Api.Controllers
         }
 
     [HttpGet]
+    [MapToApiVersion("1.0")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
@@ -45,6 +50,18 @@ namespace Api.Controllers
             return NotFound();
         }
         return _mapper.Map<MedicamentoProveedorDto>(entidad);
+    }
+
+    [HttpGet]
+    [MapToApiVersion("1.1")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+    public async Task<ActionResult<IEnumerable<MedicamentoProveedorDto>>> Get([FromQuery] Params Parameters)
+    {
+        var entidad = await _unitOfWork.MedicamentoProveedores.GetAllAsync(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<MedicamentoProveedorDto>>(entidad.registros);
+        return Ok(new Pager<MedicamentoProveedorDto>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
     }
 
     //CONSULTA B-4
