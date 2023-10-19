@@ -34,6 +34,25 @@ namespace Aplicacion.Repository
             .FirstOrDefaultAsync(p => p.Id == id);
         }
 
+        public override async Task<(int totalRegistros, IEnumerable<Cita> registros)> GetAllAsync(int pageIndez, int pageSize, int search)
+    {
+        var query = _context.Citas as IQueryable<Cita>;
+
+        if (!string.IsNullOrEmpty(search.ToString()))
+        {
+            query = query.Where(p => p.IdVeterinarioFk == search);
+        }
+
+        query = query.OrderBy(p => p.Id);
+        var totalRegistros = await query.CountAsync();
+        var registros = await query
+            .Skip((pageIndez - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (totalRegistros, registros);
+    }
+
         //CONSULTA A-6 : Listar las mascotas que fueron atendidas por motivo de vacunacion en el primer trimestre del 2023
         public async Task<IEnumerable<object>> GetPetMotiveDate()
         {

@@ -45,9 +45,9 @@ namespace Api.Controllers
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IEnumerable<RazaDto>>> Get([FromQuery] Params Parameters)
     {
-        var Breed = await _unitOfWork.Razas.GetAllAsync(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
-        var listEntidad = _mapper.Map<List<RazaDto>>(Breed.registros);
-        return Ok(new Pager<RazaDto>(listEntidad, Breed.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
+        var entidad = await _unitOfWork.Razas.GetAllAsync(Parameters.PageIndex, Parameters.PageSize, Parameters.Search);
+        var listEntidad = _mapper.Map<List<RazaDto>>(entidad.registros);
+        return Ok(new Pager<RazaDto>(listEntidad, entidad.totalRegistros, Parameters.PageIndex, Parameters.PageSize, Parameters.Search));
     }
 
     [HttpGet("{id}")]
