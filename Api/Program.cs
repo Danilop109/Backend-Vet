@@ -1,3 +1,4 @@
+using System.Reflection;
 using Api.Extension;
 using AspNetCoreRateLimit;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureRatelimiting();
 builder.Services.ConfigureApiVersioning();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(Assembly.GetEntryAssembly());
 builder.Services.ConfigureCors();
 builder.Services.AddAplicacionServices();
 builder.Services.AddJwt(builder.Configuration);

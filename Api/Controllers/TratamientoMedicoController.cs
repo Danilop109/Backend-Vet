@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
-    public class TratamientoMedicoController : Controller
+    public class TratamientoMedicoController : BaseApiController
     {
        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;

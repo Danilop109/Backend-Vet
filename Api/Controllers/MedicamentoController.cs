@@ -50,7 +50,6 @@ namespace Api.Controllers
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
     public async Task<ActionResult<Medicamento>> Post(MedicamentoDto medicamentoDto)
     {
         var entidad = this._mapper.Map<Medicamento>(medicamentoDto);
@@ -62,6 +61,29 @@ namespace Api.Controllers
         }
         medicamentoDto.Id = entidad.Id;
         return CreatedAtAction(nameof(Post), new {id = medicamentoDto.Id}, medicamentoDto);
+    }
+
+
+    //CONSULTA 2
+    [HttpGet("GetMediFromLab")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Medicamento>> GetMediFromLabConsulta2()
+    {
+        var entidad = await _unitOfWork.Medicamentos.GetMediFromLab();
+        var dto = _mapper.Map<IEnumerable<Medicamento>>(entidad);
+        return Ok(dto);
+    }
+
+    //CONSULTA 5
+    [HttpGet("GetMedi50000")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Medicamento>> GetMedi50000Consulta5()
+    {
+        var entidad = await _unitOfWork.Medicamentos.GetMedi50000();
+        var dto = _mapper.Map<IEnumerable<Medicamento>>(entidad);
+        return Ok(dto);
     }
 
     [HttpPut("{id}")]

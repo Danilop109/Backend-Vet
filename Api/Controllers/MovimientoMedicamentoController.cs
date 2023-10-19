@@ -47,6 +47,17 @@ namespace Api.Controllers
         return _mapper.Map<MovimientoMedicamentoDto>(entidad);
     }
 
+    //CONSULTA B-2
+    [HttpGet("GetmoviMedi")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<object>> GetmoviMediConsultaB2()
+    {
+        var entidad = await _unitOfWork.MovimientoMedicamentos.GetmoviMedi();
+        var dto = _mapper.Map<IEnumerable<object>>(entidad);
+        return Ok(dto);
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

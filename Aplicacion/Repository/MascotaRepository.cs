@@ -47,11 +47,23 @@ namespace Aplicacion.Repository
                 select m
             ).ToListAsync();
         }
-        public async Task<IEnumerable<Mascota>> GetPetEspecie2()
+
+        //CONSULTA B-1: Listar todas las mascotas agrupadas por especie. SOSPECHOSA
+
+        public async Task<IEnumerable<object>> GetPetGropuByEspe()
         {
-            return await _context.Mascotas
-            .Where(m => m.IdEspecieFk == 1)
-            .ToListAsync();
+            var objeto = from e in _context.Especies
+            join m in _context.Mascotas on e.Id equals m.IdEspecieFk into grupoEspecie
+            select new {
+                Nombre= e.Nombre,
+                mascotica= grupoEspecie.Select(m => new 
+                        {
+                            Nombre = m.Nombre,
+                            Fecha = m.FechaNacimiento
+                        }).ToList()
+
+            };
+            return await objeto.ToListAsync();
         }
     }
 }

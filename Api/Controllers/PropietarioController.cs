@@ -47,6 +47,17 @@ namespace Api.Controllers
         return _mapper.Map<PropietarioDto>(entidad);
     }
 
+    //CONSULTA 4
+    [HttpGet("GetPetPer")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<object>> GetPetPerConsulta4()
+    {
+        var entidad = await _unitOfWork.Propietarios.GetPetPer();
+        var dto = _mapper.Map<IEnumerable<object>>(entidad);
+        return Ok(dto);
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -31,5 +31,22 @@ namespace Aplicacion.Repository
             .Include(m => m.TipoMovimiento)
             .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        //CONSULTA B-2: Listar todos los movimientos de medicamentos y el valor total de cada movimiento.
+        public async Task<IEnumerable<object>> GetmoviMedi()
+    {
+        
+        var Movimiento = await (
+            from d in _context.DetalleMovimientos
+            join m in _context.MovimientoMedicamentos on d.IdMovimientoMedicamentoFk equals m.Id
+            select new{
+                idMovimientoMedicamento = m.Id,
+                TipoMovimiento = m.TipoMovimiento.Descripcion,
+                total = d.Precio * d.Cantidad,
+            }).Distinct()
+            .ToListAsync();
+
+        return Movimiento;
+    }
     }
 }

@@ -46,7 +46,17 @@ namespace Api.Controllers
         }
         return _mapper.Map<CitaDto>(entidad);
     }
-
+    
+    //CONSULTA 6
+    [HttpGet("GetPetMotiveDate")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<object>> GetPetMotiveDateConsulta6()
+    {
+        var entidad = await _unitOfWork.Citas.GetPetMotiveDate();
+        var dto = _mapper.Map<IEnumerable<object>>(entidad);
+        return Ok(dto);
+    }
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

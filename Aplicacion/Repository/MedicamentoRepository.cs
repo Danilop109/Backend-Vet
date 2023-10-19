@@ -43,5 +43,14 @@ namespace Aplicacion.Repository
                 
             ).ToListAsync();
         }
+
+        //CONSULTA A-5: Listar los medicamentos que tenga un precio de venta mayor a 50000
+
+        public async Task<IEnumerable<Medicamento>> GetMedi50000()
+        {
+            return await _context.Medicamentos
+            .Where(m => m.Precio >= 50000)
+            .ToListAsync();
+        }
     }
 }

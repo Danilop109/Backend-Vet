@@ -46,24 +46,25 @@ namespace Api.Controllers
         }
         return _mapper.Map<MascotaDto>(entidad);
     }
-
+    //CONSULTA 3
     [HttpGet("GetPetEspecie")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Mascota>> GetPetEspecieConsulta()
+    public async Task<ActionResult<Mascota>> GetPetEspecieConsulta3()
     {
         var entidad = await _unitOfWork.Mascotas.GetPetEspecie();
         var dto = _mapper.Map<IEnumerable<Mascota>>(entidad);
         return Ok(dto);
     }
 
-    [HttpGet("GetPetEspecie2")]
+    //CONSULTA B-1
+    [HttpGet("GetPetGropuByEspe")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Mascota>> GetPetEspecieConsulta2()
+    public async Task<ActionResult<object>> GetPetGropuByEspeConsultaB1()
     {
-        var entidad = await _unitOfWork.Mascotas.GetPetEspecie2();
-        var dto = _mapper.Map<IEnumerable<Mascota>>(entidad);
+        var entidad = await _unitOfWork.Mascotas.GetPetGropuByEspe();
+        var dto = _mapper.Map<IEnumerable<object>>(entidad);
         return Ok(dto);
     }
 

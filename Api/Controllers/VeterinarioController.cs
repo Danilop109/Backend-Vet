@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Api.Controllers
 {
-    public class VeterinarioController : Controller
+    public class VeterinarioController : BaseApiController
     {
        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -45,6 +45,16 @@ namespace Api.Controllers
             return NotFound();
         }
         return _mapper.Map<VeterinarioDto>(entidad);
+    }
+    //CONSULTA 1
+    [HttpGet("GetCirujanoVascular")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<Veterinario>> GetPetEspecieConsulta1()
+    {
+        var entidad = await _unitOfWork.Veterinarios.GetCirujanoVascular();
+        var dto = _mapper.Map<IEnumerable<Veterinario>>(entidad);
+        return Ok(dto);
     }
 
     [HttpPost]
